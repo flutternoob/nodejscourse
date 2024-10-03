@@ -1,7 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
-const Blog = require("./models/blog");
+const blogRoutes = require("./routes/blogRoutes");
 
 const app = express();
 
@@ -26,6 +26,8 @@ app.set("view engine", "ejs");
 //middleware and static files
 
 app.use(express.static("public"));
+app.use(express.urlencoded({ extended: true })); //this is middleware for accepting form data
+app.use(morgan("dev"));
 
 /* app.use((req, res, next) => {
     console.log("New request made:");
@@ -39,8 +41,6 @@ app.use(express.static("public"));
     console.log("In the next middleware:");
     next();
 }); */
-
-app.use(morgan("dev"));
 
 //mongoose and mongo sandbox routes
 
@@ -103,19 +103,7 @@ app.get("/about", (req, res) => {
 
 //blog routes
 
-app.get("/blogs", (req, res) => {
-    Blog.find().sort({ createdAt: -1 })
-        .then((result) => {
-            res.render("index", { title: "All Blogs" , blogs: result})
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-})
-
-app.get("/blogs/create/", (req, res) => {
-    res.render("create", { title: "Create a new blog" });
-});
+app.use("/blogs", blogRoutes);
 
 //redirects
 
